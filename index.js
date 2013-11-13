@@ -1,8 +1,8 @@
 /* -------------------------------------------------------------------------------------------*/
 // get the position, trap success, and offer up switching to lower accuracy on error
 var options = {
-    maximumAge: 10000,
-    timeout: 10000,
+    maximumAge: 600000,
+    timeout: 5000,
     enableHighAccuracy: true
 }
 
@@ -22,41 +22,42 @@ function errorCallback_on_highAccuracy(position) {
     {
         // Attempt to get GPS location timed out after 5 seconds,
         // then try low accuracy location
-        console.log("attempting to get low accuracy location");
+        $('body').append("<p class='waitformap'>Attempting to get low accuracy location via mobile network...</p>");
         navigator.geolocation.getCurrentPosition(
                successCallback,
                errorCallback_on_lowAccuracy,
-               {maximumAge: 10000, timeout: 10000, enableHighAccuracy: false});
+               {maximumAge: 600000, timeout: 10000, enableHighAccuracy: false});
         return;
     }
 
-    var msg = "Can't get your location (high accuracy attempt). Error = ";
+    var msg = "<p class='waitformap'>Can't get your location via high accuracy attempt (GPS). Error = ";
     if (error.code == 1)
         msg += "PERMISSION_DENIED";
     else if (error.code == 2)
         msg += "POSITION_UNAVAILABLE";
-    msg += ", msg = " + error.message;
+    msg += ", msg = " + error.message + "</p>";
 
-    console.log(msg);
+    $('body').append(msg);
 }
 
 function errorCallback_on_lowAccuracy(position) {
-    var msg = "Can't get your location (low accuracy attempt). Error = ";
+    var msg = "<p class='waitformap'>Can't get your location via low accuracy attempt (mobile network). Error = ";
     if (error.code == 1)
         msg += "PERMISSION_DENIED";
     else if (error.code == 2)
         msg += "POSITION_UNAVAILABLE";
     else if (error.code == 3)
         msg += "TIMEOUT";
-    msg += ", msg = " + error.message;
+    msg += ", msg = " + error.message + "</p>";
 
-    console.log(msg);
+    $('body').append(msg);
 }
 
 /* -------------------------------------------------------------------------------------------*/
 // when we are successful at getting a position, we do all our map creation work inside here
 
 function successCallback(position) {
+	$('#map').append('<p class="waitformap">map loading...</p>');
     var customerLatitude = position.coords.latitude,
         customerLongitude = position.coords.longitude,
         accuracy = position.coords.accuracy,
@@ -73,9 +74,10 @@ function successCallback(position) {
     //console.log("Your location is: " + customerLatitude + "," + customerLongitude+" Accuracy="+position.coords.accuracy+"m");
 
     var map = L.map('map');
-/*     playing with watercolor map.  looks nice, but not very informative
-    var layer = new L.StamenTileLayer('watercolor');
-      map.addLayer(layer); */
+    
+//  playing with watercolor map.  looks pretty, but not very informative
+//    var layer = new L.StamenTileLayer('watercolor');
+//    map.addLayer(layer); */
 
     // add an OpenStreetMap tile layer
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {

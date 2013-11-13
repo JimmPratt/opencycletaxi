@@ -9,6 +9,6 @@ html, body {
   height:100%;
   margin:auto;
 }
-#waitformap {
+.waitformap {
   text-align:center;
 }
